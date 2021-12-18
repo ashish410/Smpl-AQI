@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Taken from https://www.airnow.gov/aqi/aqi-basics/ -->
+    <color name="aqi_good">#00E500</color>
+    <color name="aqi_moderate">#FEFE01</color>
+    <color name="aqi_sensitive">#FF7C01</color>
+    <color name="aqi_unhealthy">#FF0100</color>
+    <color name="aqi_very_unhealthy">#8F3F97</color>
+    <color name="aqi_hazardous">#7F0023</color>
 </resources>
