@@ -1,26 +1,30 @@
 package com.ash.smplaqi.ui
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ash.smplaqi.data.CityAqi
-import com.ash.smplaqi.network.WebSocketServiceImpl
-import kotlinx.coroutines.launch
+import com.ash.smplaqi.data.model.CityAqi
+import com.ash.smplaqi.repository.AQIRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(private val aqiRepository: AQIRepository) : ViewModel() {
 
-    private val mutableLiveData = MutableLiveData<List<CityAqi>>()
-    val liveData: LiveData<List<CityAqi>> = mutableLiveData
+    var selectedCityLiveData = MutableLiveData<String>()
 
-    private val webSocketServiceImpl: WebSocketServiceImpl = WebSocketServiceImpl {
-        viewModelScope.launch {
-            mutableLiveData.value = it
-        }
+    fun getLatestData(): Flow<List<CityAqi>> = aqiRepository.getLatestData()
+
+    fun getSelectedCityData(): Flow<List<CityAqi>>? {
+        val city = selectedCityLiveData.value ?: return null
+        return aqiRepository.getLastValuesOf(city)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        webSocketServiceImpl.cancel()
+    fun connect() {
+        aqiRepository.connect()
+    }
+
+    fun cancel() {
+        aqiRepository.cancel()
     }
 }
