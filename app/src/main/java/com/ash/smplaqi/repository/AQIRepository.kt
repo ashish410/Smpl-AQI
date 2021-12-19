@@ -6,7 +6,6 @@ import com.ash.smplaqi.data.datasource.RemoteSource
 import com.ash.smplaqi.data.db.CityAqiDao
 import com.ash.smplaqi.data.model.CityAqi
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.lang.reflect.Type
 import javax.inject.Inject
@@ -14,17 +13,16 @@ import javax.inject.Inject
 class AQIRepository @Inject constructor(
     private val okHttpClient: OkHttpClient,
     private val cityAqiDao: CityAqiDao,
-    private val request: Request
+    private val request: Request,
+    private val gson: Gson,
+    private val type: Type
 ) : RemoteSource, LocalSource {
 
     companion object {
         const val TAG = "AQIRepository"
     }
 
-    private val gson = Gson()
-    private val type: Type = object : TypeToken<List<CityAqi?>?>() {}.type
-
-    var connectionCallBack: ConnectionCallBack? = null
+    var failConnectionListener: FailConnectionListener? = null
     private var webSocket: WebSocket? = null
 
     private val listener = object : WebSocketListener() {
@@ -40,7 +38,7 @@ class AQIRepository @Inject constructor(
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             super.onFailure(webSocket, t, response)
-            connectionCallBack?.onConnectionFailure()
+            failConnectionListener?.onConnectionFailed()
         }
     }
 
