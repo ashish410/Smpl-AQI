@@ -26,6 +26,11 @@ Also fetching data from the network and integrating persisted data in the databa
 <p align="center"><img alt="mad_scorecard" src="https://github.com/ashish410/Smpl-AQI/blob/master/screenshots/jetpack.png" /></p>
 <br>
 
+## Time Taken
+- Time Taken: 2 Days
+- Features built: City AQI list Screen(1.5 days), Graph Screen(0.5 day) 
+<br>
+
 ## Libraries and tech used
 - Minimum SDK level 24
 - Hilt for dependency injection.
