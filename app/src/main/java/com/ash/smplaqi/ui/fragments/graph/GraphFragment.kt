@@ -49,6 +49,9 @@ class GraphFragment : Fragment() {
                 delay(WS_DELAY)
             }
         }
+        mainViewModel.selectedCityLiveData.observe(this){
+            mBinding?.txtCityName?.text = it
+        }
     }
 
     private fun setBarChartData(list: List<CityAqi>) {
