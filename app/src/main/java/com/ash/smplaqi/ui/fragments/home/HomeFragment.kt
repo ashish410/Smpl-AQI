@@ -3,13 +3,11 @@ package com.ash.smplaqi.ui.fragments.home
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -26,13 +24,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-    private var binding: FragmentHomeBinding? = null
+    private var mBinding: FragmentHomeBinding? = null
     private val mainViewModel: MainViewModel by activityViewModels()
-    private lateinit var connectivityManager: ConnectivityManager
-
-    private val aqiListAdapter = AqiListAdapter {
-        onCityClicked(it)
-    }
+    private lateinit var mConnectivityManager: ConnectivityManager
+    private val mAqiListAdapter = AqiListAdapter { onCityClicked(it) }
 
     private fun onCityClicked(cityAqi: CityAqi) {
         mainViewModel.selectedCityLiveData.value = cityAqi.city
@@ -41,7 +36,7 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        connectivityManager =
+        mConnectivityManager =
             requireActivity().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
@@ -49,8 +44,8 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
-        return binding?.root
+        mBinding = FragmentHomeBinding.inflate(inflater, container, false)
+        return mBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,20 +59,20 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadData() {
-        binding?.progressBar?.visibility = View.VISIBLE
+        mBinding?.progressBar?.visibility = View.VISIBLE
         lifecycleScope.launch {
             mainViewModel.getLatestData().collect {
-                binding?.progressBar?.visibility = View.GONE
-                binding?.aqiRecyclerView?.visibility = View.VISIBLE
-                aqiListAdapter.updateList(it)
+                mBinding?.progressBar?.visibility = View.GONE
+                mBinding?.aqiRecyclerView?.visibility = View.VISIBLE
+                mAqiListAdapter.updateList(it)
             }
         }
     }
 
     private fun setUpRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(activity)
-        binding?.aqiRecyclerView?.let {
-            it.adapter = aqiListAdapter
+        mBinding?.aqiRecyclerView?.let {
+            it.adapter = mAqiListAdapter
             it.layoutManager = linearLayoutManager
             (it.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
@@ -86,18 +81,18 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        binding = null
+        mBinding = null
     }
 
 
     override fun onResume() {
         super.onResume()
-        connectivityManager.registerDefaultNetworkCallback(networkListener)
+        mConnectivityManager.registerDefaultNetworkCallback(networkListener)
     }
 
     override fun onPause() {
         super.onPause()
-        connectivityManager.unregisterNetworkCallback(networkListener)
+        mConnectivityManager.unregisterNetworkCallback(networkListener)
         mainViewModel.cancel()
     }
 
