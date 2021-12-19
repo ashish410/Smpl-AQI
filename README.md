@@ -41,7 +41,7 @@ Also fetching data from the network and integrating persisted data in the databa
   - Room Persistence - construct a database to store city aqi data.
 - Architecture
   - MVVM Architecture (View - DataBinding - ViewModel - Model)
-- [OkHttp3](https://github.com/square/okhttp) - for REST APIs and network data.
+- [OkHttp3](https://github.com/square/okhttp) - for WebSocket connection.
 - [Gson](https://github.com/google/gson/) - A JSON library for parsing network response.
 - [Material-Components](https://github.com/material-components/material-components-android) - Material design components for CardView.
 <br>
