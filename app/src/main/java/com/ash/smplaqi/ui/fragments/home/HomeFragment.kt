@@ -89,7 +89,7 @@ class HomeFragment : Fragment() {
         binding = null
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
+
     override fun onResume() {
         super.onResume()
         connectivityManager.registerDefaultNetworkCallback(networkListener)
