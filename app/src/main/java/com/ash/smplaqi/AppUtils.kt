@@ -1,20 +1,20 @@
 package com.ash.smplaqi
 
+import android.content.Context
 import com.ash.smplaqi.data.model.CityAqi
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.floor
+import android.net.NetworkInfo
+import android.net.ConnectivityManager
 
-const val DATE_FORMAT = "hh : mm a"
-const val SECONDS_AGO = "seconds ago"
-const val MINUTES_AGO = "minutes ago"
-const val HOURS_AGO = "hours ago"
-
-var simpleDateFormat = SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+val SIMPLE_DATE_FORMAT = SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH)
 
 /**
  * @param dataList is the new city data list
  * @param adapterDataList is the current adapter data from RecyclerView
+ *
+ * This method adds color and time to the existing list
  */
 fun mergeNewAndOldList(
     dataList: List<CityAqi>,
@@ -26,6 +26,10 @@ fun mergeNewAndOldList(
     return adapterDataList
 }
 
+/**
+ * This method updates the time for adapter items
+ * @param adapterDataList is the current adapter list from recyclerView
+ */
 private fun addTimeToNewAdapterList(adapterDataList: MutableList<CityAqi>) {
     adapterDataList.forEach {
         it.seconds?.let { seconds ->
@@ -43,7 +47,7 @@ private fun addTimeToNewAdapterList(adapterDataList: MutableList<CityAqi>) {
                     it.lastUpdated = "$hours $HOURS_AGO"
                 }
                 diffSeconds > 60 * 60 * 60 -> {
-                    it.lastUpdated = simpleDateFormat.format(diffSeconds * 1000)
+                    it.lastUpdated = SIMPLE_DATE_FORMAT.format(diffSeconds * 1000)
                 }
             }
         }
@@ -51,6 +55,9 @@ private fun addTimeToNewAdapterList(adapterDataList: MutableList<CityAqi>) {
     }
 }
 
+/**
+ * This methods adds color for the aqi
+ */
 private fun addColorToDataList(
     dataList: List<CityAqi>,
     adapterDataList: MutableList<CityAqi>
@@ -88,4 +95,31 @@ fun setAqiColor(aqi: Double): Int {
         return R.color.aqi_hazardous //Hazardous
     }
     return R.color.black
+}
+
+fun getAqiStatus(aqi: Double): String {
+    if (aqi > 0 && aqi < 50) {
+        return "Good" //Good
+    } else if (aqi > 50 && aqi < 100) {
+        return "Satisfactory" //Moderate
+    } else if (aqi > 100 && aqi < 200) {
+        return "Moderate" //Unhealthy for Sensitive Groups
+    } else if (aqi > 200 && aqi < 300) {
+        return "Poor" //Unhealthy
+    } else if (aqi > 300 && aqi < 400) {
+        return "Very Poor" //Very Unhealthy
+    } else if (aqi > 400 && aqi < 500) {
+        return "Severe" //Hazardous
+    }
+    return "Radioactive"
+}
+
+fun Number.roundTo(
+    numFractionDigits: Int
+) = "%.${numFractionDigits}f".format(this, Locale.ENGLISH)
+
+fun isNetworkAvailable(context: Context?): Boolean {
+    val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork: NetworkInfo? = cm.activeNetworkInfo
+    return activeNetwork?.isConnectedOrConnecting == true
 }

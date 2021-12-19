@@ -9,10 +9,10 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- Taken from https://www.airnow.gov/aqi/aqi-basics/ -->
-    <color name="aqi_good">#00E500</color>
-    <color name="aqi_moderate">#FEFE01</color>
-    <color name="aqi_sensitive">#FF7C01</color>
-    <color name="aqi_unhealthy">#FF0100</color>
-    <color name="aqi_very_unhealthy">#8F3F97</color>
-    <color name="aqi_hazardous">#7F0023</color>
+    <color name="aqi_good">#54A84E</color>
+    <color name="aqi_moderate">#A2C852</color>
+    <color name="aqi_sensitive">#FFF933</color>
+    <color name="aqi_unhealthy">#F29D32</color>
+    <color name="aqi_very_unhealthy">#E83E33</color>
+    <color name="aqi_hazardous">#AF2D24</color>
 </resources>

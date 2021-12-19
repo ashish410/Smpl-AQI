@@ -4,6 +4,7 @@ import android.content.Context
 import com.ash.smplaqi.WS_URL
 import com.ash.smplaqi.data.db.CityAqiDatabase
 import com.ash.smplaqi.data.model.CityAqi
+import com.ash.smplaqi.repository.WebSocketImpl
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.Module
@@ -14,6 +15,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -22,7 +24,9 @@ class AppModule {
 
     @Singleton
     @Provides
-    fun providesOkhttpClient() = OkHttpClient()
+    fun providesOkhttpClient(): OkHttpClient {
+        return OkHttpClient().newBuilder().pingInterval(30, TimeUnit.SECONDS).build()
+    }
 
     @Provides
     @Singleton
@@ -47,5 +51,13 @@ class AppModule {
     @Provides
     fun providesGsonTypeToken(): Type {
         return object : TypeToken<List<CityAqi?>?>() {}.type
+    }
+
+    @Singleton
+    @Provides
+    fun providesWebSocketImpl(
+        okHttpClient: OkHttpClient, request: Request, gson: Gson, type: Type
+    ): WebSocketImpl {
+        return WebSocketImpl(okHttpClient, request, gson, type)
     }
 }

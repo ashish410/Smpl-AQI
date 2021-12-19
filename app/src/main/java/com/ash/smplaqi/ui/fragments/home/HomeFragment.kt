@@ -3,6 +3,7 @@ package com.ash.smplaqi.ui.fragments.home
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkRequest
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,18 +17,21 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import com.ash.smplaqi.R
 import com.ash.smplaqi.data.model.CityAqi
 import com.ash.smplaqi.databinding.FragmentHomeBinding
+import com.ash.smplaqi.isNetworkAvailable
+import com.ash.smplaqi.repository.FailConnectionListener
 import com.ash.smplaqi.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), FailConnectionListener {
 
     private var mBinding: FragmentHomeBinding? = null
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var mConnectivityManager: ConnectivityManager
     private val mAqiListAdapter = AqiListAdapter { onCityClicked(it) }
+    private val networkRequest = NetworkRequest.Builder().build()
 
     private fun onCityClicked(cityAqi: CityAqi) {
         mainViewModel.selectedCityLiveData.value = cityAqi.city
@@ -51,6 +55,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        checkInternet()
+
+        mainViewModel.setConnectionFailureListener(this)
+
         mainViewModel.connect()
 
         setUpRecyclerView()
@@ -58,11 +66,16 @@ class HomeFragment : Fragment() {
         loadData()
     }
 
+    private fun checkInternet() {
+        if (!isNetworkAvailable(context)) noInternetUI()
+    }
+
     private fun loadData() {
         mBinding?.progressBar?.visibility = View.VISIBLE
         lifecycleScope.launch {
             mainViewModel.getLatestData().collect {
                 mBinding?.progressBar?.visibility = View.GONE
+                mBinding?.errorText?.visibility = View.GONE
                 mBinding?.aqiRecyclerView?.visibility = View.VISIBLE
                 mAqiListAdapter.updateList(it)
             }
@@ -80,14 +93,14 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-
+        mainViewModel.setConnectionFailureListener(null)
         mBinding = null
     }
 
-
     override fun onResume() {
         super.onResume()
-        mConnectivityManager.registerDefaultNetworkCallback(networkListener)
+        mainViewModel.connect()
+        mConnectivityManager.registerNetworkCallback(networkRequest, networkListener)
     }
 
     override fun onPause() {
@@ -98,16 +111,35 @@ class HomeFragment : Fragment() {
 
     private val networkListener = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            requireActivity().runOnUiThread {
+            lifecycleScope.launch {
                 mainViewModel.connect()
+                mBinding?.errorText?.visibility = View.GONE
                 loadData()
             }
         }
 
         override fun onLost(network: Network) {
-            requireActivity().runOnUiThread {
-
+            lifecycleScope.launch {
+                //Show network error ui
+                noInternetUI()
             }
+        }
+    }
+
+    private fun noInternetUI() {
+        mBinding?.progressBar?.visibility = View.GONE
+        mBinding?.aqiRecyclerView?.visibility = View.GONE
+        mBinding?.errorText?.visibility = View.VISIBLE
+        mBinding?.errorText?.text = getString(R.string.no_internet)
+    }
+
+    override fun onSocketFailure() {
+        lifecycleScope.launch {
+            //Show error UI
+            mBinding?.progressBar?.visibility = View.GONE
+            mBinding?.aqiRecyclerView?.visibility = View.GONE
+            mBinding?.errorText?.visibility = View.VISIBLE
+            mBinding?.errorText?.text = getString(R.string.socket_failure)
         }
     }
 }

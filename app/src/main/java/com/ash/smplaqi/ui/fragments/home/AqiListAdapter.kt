@@ -5,7 +5,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ash.smplaqi.data.model.CityAqi
-import com.ash.smplaqi.databinding.ItemCityAqiBinding
+import com.ash.smplaqi.databinding.ItemAqiCellBinding
+import com.ash.smplaqi.getAqiStatus
 import com.ash.smplaqi.mergeNewAndOldList
 import com.ash.smplaqi.roundTo
 import java.util.ArrayList
@@ -22,7 +23,7 @@ class AqiListAdapter(private val onCityClicked: (CityAqi) -> Unit) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AqiListViewHolder {
         val itemBinding =
-            ItemCityAqiBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemAqiCellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AqiListViewHolder(itemBinding, onCityClicked)
     }
 
@@ -34,12 +35,13 @@ class AqiListAdapter(private val onCityClicked: (CityAqi) -> Unit) :
     override fun getItemCount() = cityAqiList.size
 
     inner class AqiListViewHolder(
-        private val itemBinding: ItemCityAqiBinding,
+        private val itemBinding: ItemAqiCellBinding,
         private val onCityClicked: (CityAqi) -> Unit
     ) : RecyclerView.ViewHolder(itemBinding.root) {
         fun bind(cityAqi: CityAqi) {
             itemBinding.txtCity.text = cityAqi.city
             itemBinding.txtAqi.text = cityAqi.aqi.roundTo(2)
+            itemBinding.txtAqiStatus.text = getAqiStatus(cityAqi.aqi)
             itemBinding.txtLastUpdated.text = cityAqi.lastUpdated
             val aqiColor = cityAqi.aqiColor
             if (aqiColor != null)

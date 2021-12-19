@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.ash.smplaqi.WS_DELAY
 import com.ash.smplaqi.calculateTimeDifference
 import com.ash.smplaqi.data.model.CityAqi
 import com.ash.smplaqi.databinding.FragmentGraphBinding
@@ -16,6 +17,7 @@ import com.ash.smplaqi.setAqiColor
 import com.ash.smplaqi.ui.MainViewModel
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -24,6 +26,7 @@ class GraphFragment : Fragment() {
     private var mBinding: FragmentGraphBinding? = null
     private var mBarData: BarData? = null
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val city = "City"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,6 +46,7 @@ class GraphFragment : Fragment() {
         lifecycleScope.launch {
             mainViewModel.getSelectedCityData()?.collect {
                 setBarChartData(it)
+                delay(WS_DELAY)
             }
         }
     }
@@ -63,7 +67,7 @@ class GraphFragment : Fragment() {
                 )
             }
         }
-        val barDataSet = BarDataSet(entryList, "city")
+        val barDataSet = BarDataSet(entryList, city)
         barDataSet.colors = colorList
         mBarData = BarData(barDataSet)
         mBinding?.barChart?.data = mBarData
@@ -73,7 +77,6 @@ class GraphFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         mBinding = null
     }
 }

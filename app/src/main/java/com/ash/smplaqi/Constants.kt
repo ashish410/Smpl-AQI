@@ -1,9 +1,9 @@
 package com.ash.smplaqi
 
-import java.util.*
-
 const val WS_URL = "wss://city-ws.herokuapp.com/"
+const val WS_DELAY: Long = 30_000L
 
-fun Number.roundTo(
-    numFractionDigits: Int
-) = "%.${numFractionDigits}f".format(this, Locale.ENGLISH)
+const val DATE_FORMAT = "hh : mm a"
+const val SECONDS_AGO = "seconds ago"
+const val MINUTES_AGO = "minutes ago"
+const val HOURS_AGO = "hours ago"

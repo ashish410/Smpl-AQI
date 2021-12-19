@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ash.smplaqi.data.model.CityAqi
 import com.ash.smplaqi.repository.AQIRepository
+import com.ash.smplaqi.repository.FailConnectionListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -26,5 +27,9 @@ class MainViewModel @Inject constructor(private val aqiRepository: AQIRepository
 
     fun cancel() {
         aqiRepository.cancel()
+    }
+
+    fun setConnectionFailureListener(failConnectionListener: FailConnectionListener?){
+        aqiRepository.failConnectionListener = failConnectionListener
     }
 }
